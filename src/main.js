@@ -22,39 +22,44 @@ let perPage = 15;
 const onSearchSubmit = async e => {
   e.preventDefault();
   value = e.target.elements.inputField.value.toLowerCase().trim();
-  page = 1;
+  page = 1; // Reset page to 1 for a new search
+
   if (!value) {
     iziToast.error({
       title: 'Error',
-      message: 'You need to type something on field!',
+      message: 'You need to type something in the field!',
       position: 'topRight',
     });
     return;
   }
+
   loader.classList.remove('hidden');
+  galleryList.innerHTML = ''; // Clear previous results
+
   try {
     const response = await fetchPhotos(value, page);
     if (response.data.total === 0) {
       iziToast.error({
-        message:
-          'Sorry, there are no images matching your search query. Please try again!',
+        message: 'Sorry, there are no images matching your search query. Please try again!',
         position: 'topRight',
       });
       loader.classList.add('hidden');
-      galleryList.innerHTML = '';
-      form.reset();
+      loadMore.classList.add('hidden'); // Hide load more button if no results
       return;
     } else {
       greateCards(response.data.hits);
       lightBox.refresh();
       loader.classList.add('hidden');
-      loadMore.classList.remove('hidden');
+      loadMore.classList.remove('hidden'); // Show load more button
+      totalPages = response.data.totalHits; // Update total pages
     }
   } catch (err) {
     iziToast.error({
       message: `There is an Error ${err}. Try again!`,
       position: 'topRight',
     });
+  } finally {
+    form.reset(); // Clear form input after search
   }
 };
 
@@ -65,10 +70,6 @@ const onLoadMoreClick = async e => {
     loader.classList.remove('hidden');
     const response = await fetchPhotos(value, page);
     greateCards(response.data.hits);
-    totalPages = response.data.totalHits;
-    console.log(response);
-    console.log(page);
-    console.log(totalPages);
     if (page * perPage >= totalPages) {
       iziToast.error({
         message: "We're sorry, but you've reached the end of search results.",
