@@ -42,15 +42,13 @@ const onSearchSubmit = async e => {
       });
       loader.classList.add('hidden');
       galleryList.innerHTML = '';
-      form.reset();  // Очищення поля форми, якщо немає результатів
+      form.reset();
       return;
     } else {
-      galleryList.innerHTML = '';  // Очищення галереї перед відображенням нових 
       greateCards(response.data.hits);
       lightBox.refresh();
       loader.classList.add('hidden');
       loadMore.classList.remove('hidden');
-      form.reset();  // Очищення поля форми після пошуку
     }
   } catch (err) {
     iziToast.error({
